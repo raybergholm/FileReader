@@ -1,5 +1,5 @@
 // JS FileReader extension. Reads the contents of a FileList into an internal array which contains the File object and its contents as read by FileReader.
-// © Raymond Bergholm 2016 - https://github.com/raybergholm
+// Copyright 2016 Raymond Bergholm - https://github.com/raybergholm - MIT licence.
 
 function RtwFileReader(params){
 	this.ReadMode = { // TODO 1.1: static? being able to read this from RtwFileReader.ReadMode would be a QoL improvement
