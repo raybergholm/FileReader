@@ -7,3 +7,4 @@ TODO LIST:
 - ReadMode enum should be accessible without instantiation
 - fix logic for reading files directly from the constructor
 - more callbacks?
+- usage examples
