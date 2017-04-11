@@ -117,8 +117,7 @@ function LocalFileReader(params){
 		this.read(inputFiles, this.ReadMode.TEXT);
 	};
 
-	var attachCallbacks(fileReader)
-	{
+	var attachCallbacks = function(fileReader){
 		if(this._callbacks.onReadCompleted !== null)
 		{
 			reader.addEventListener("loadend", function(currentFile, evt){
