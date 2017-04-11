@@ -4,9 +4,26 @@ A JavaScript file reader, extends functionality of the built-in JS FileReader. T
 
 This reads the contents of a FileList into an internal array which contains the File object and its contents as read by FileReader.
 
-Use demo.html for a demo.
+Use demo.html for a basic demonstration.
 
-TODO LIST:
-- fix logic for reading files directly from the constructor
-- more callbacks?
-- usage examples
+### Quick use guide
+
+When instantiating the LocalFileReader, pass in the callbacks to the constructor (currently only loadend is implemented):
+
+```javascript
+    var localFileReader = new LocalFileReader({
+        callbacks: {
+            loadend: foo    // your callback here
+        }
+    });
+```
+
+Afterwards, when you need to read file contents call readFiles() and pass in the fileList and read mode:
+
+```javascript
+    var files = document.getElementById("multipleFileInput").files; // substitute in your file list source
+    var readMode = LocalFileReader.TEXT;    // use whichever mode you need
+    localFileReader.readFiles(files, readMode);
+```
+
+The callbacks will be called where applicable.
