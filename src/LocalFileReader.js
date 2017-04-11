@@ -9,16 +9,16 @@ function LocalFileReader(params){
 		UNKNOWN_ERROR: "Unknown error"
 	};
 
-	if(!window.File || !window.FileReader || !window.FileList || !window.Blob){
-		// Missing some support for the file APIs, throw an error.
-		throw new Error(errorTexts.FILE_API_UNSUPPORTED);
-	}
-
 	this._fileBuffer = [];
 	this._filesInQueue = 0;
 	this._callbacks = {};
 
 	var init = function(){
+		if(!window.File || !window.FileReader || !window.FileList || !window.Blob){
+			// Missing some support for the file APIs, throw an error.
+			throw new Error(errorTexts.FILE_API_UNSUPPORTED);
+		}
+
 		if(params != null){
 			if(params.hasOwnProperty("callbacks")){
 				this.registerCallbacks(params.callbacks);
@@ -27,7 +27,7 @@ function LocalFileReader(params){
 	}.bind(this);
 
 	/**
-	 *	Getter for the file buffer, usable e.g. if the onReadCompleted callback was not defined.
+	 *	Getter for the file buffer, usable e.g. if the loadend callback was not defined.
 	 */
 	this.getFiles = function(){
 		return this._fileBuffer;
@@ -101,7 +101,7 @@ function LocalFileReader(params){
 		}
 
 		this._callbacks = callbacks;
-	}
+	}.bind(this);
 
 	var attachStandardCallbacks = function(fileReader, currentFile)
 	{
@@ -115,7 +115,7 @@ function LocalFileReader(params){
 				currentFile.content = evt.target.result;
 				this._filesInQueue--;
 				if(this._filesInQueue === 0){
-					this._callbacks.onloadend && this._callbacks.onloadend(this._fileBuffer);
+					this._callbacks.loadend && this._callbacks.loadend(this._fileBuffer);
 				}
 			}
 		}.bind(this));
