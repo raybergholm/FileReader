@@ -39,7 +39,7 @@ function LocalFileReader(params){
 	 *
 	 *	Params:
 	 *		inputFiles: FileList
-	 *		inputMode: attempt to read all the files in the FileList using this mode (see this.ReadMode for enumeration)
+	 *		inputMode: attempt to read all the files in the FileList using this mode (see LocalFileReader.ReadMode for enumeration)
 	 */
 	this.read = function(inputFiles, inputMode){
 		var currentFile, reader, mode;
@@ -54,15 +54,7 @@ function LocalFileReader(params){
 			};
 
 			reader = new FileReader();
-			reader.addEventListener("loadend", function(currentFile, evt){
-				if (evt.target.readyState === FileReader.DONE) { // DONE === 2
-					currentFile.content = evt.target.result;
-					this._filesInQueue--;
-					if(this._filesInQueue === 0){
-						this._callbacks.onReadCompleted && this._callbacks.onReadCompleted(this._fileBuffer);
-					}
-				}
-			}.bind(this, currentFile));
+			attachCallbacks(reader);
 
 			mode = currentFile.readMode || inputMode || this.ReadMode.TEXT; // order of priority: fileBuffer entry's readMode, the general mode supplied to the read method, or Text as a fallback
 
@@ -124,6 +116,22 @@ function LocalFileReader(params){
 	this.readAsText = function(inputFiles){
 		this.read(inputFiles, this.ReadMode.TEXT);
 	};
+
+	var attachCallbacks(fileReader)
+	{
+		if(this._callbacks.onReadCompleted !== null)
+		{
+			reader.addEventListener("loadend", function(currentFile, evt){
+				if (evt.target.readyState === FileReader.DONE) { // DONE === 2
+					currentFile.content = evt.target.result;
+					this._filesInQueue--;
+					if(this._filesInQueue === 0){
+						this._callbacks.onReadCompleted && this._callbacks.onReadCompleted(this._fileBuffer);
+					}
+				}
+			}.bind(this, currentFile));
+		}
+	}
 
 	// This is at the end as this should only run when everything else has been set. If some files were passed into the constructor, read them immediately.
 	if(params.files && params.files.length > 0){
