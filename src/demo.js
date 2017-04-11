@@ -12,7 +12,7 @@ window.onload = function(evt){
 
     localFileReader = new LocalFileReader({
         callbacks: {
-            loadend: handleFileContents
+            allFilesReady: handleFileContents
         }
     });
 }

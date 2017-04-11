@@ -116,8 +116,11 @@ function LocalFileReader(params){
 			if (evt.target.readyState === FileReader.DONE) { // DONE === 2
 				currentFile.content = evt.target.result;
 				this._filesInQueue--;
+
+				this._callbacks.loadend && this._callbacks.loadend(currentFile); // custom loadend callback
+
 				if(this._filesInQueue === 0){
-					this._callbacks.loadend && this._callbacks.loadend(this._fileBuffer);
+					this._callbacks.allFilesReady && this._callbacks.allFilesReady(this._fileBuffer);
 				}
 			}
 		}.bind(this));
