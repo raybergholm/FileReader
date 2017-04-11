@@ -139,8 +139,8 @@ function LocalFileReader(params){
 }
 
 LocalFileReader.ReadMode = {
-	ARRAY_BUFFER: 'a',
-	BINARY: 'b',
-	DATA_URL: 'd',
-	TEXT: 't'
+	ARRAY_BUFFER: 'A',
+	BINARY: 'B',
+	DATA_URL: 'D',
+	TEXT: 'T'
 };
