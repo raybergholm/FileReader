@@ -1,5 +1,5 @@
 
-var fileInput, outputDiv, localFileReader;
+var fileInput, outputDiv, readModeDropdown, localFileReader;
 
 window.onload = function(evt){
     fileInput = document.getElementById("fileInput");
@@ -8,6 +8,8 @@ window.onload = function(evt){
     }
 
     outputDiv = document.getElementById("outputDiv");
+    readModeDropdown = document.getElementById("readModeDropdown");
+
     localFileReader = new LocalFileReader({
         callbacks: {
             loadend: function(files){
@@ -21,5 +23,10 @@ window.onload = function(evt){
 }
 
 function handleFileInputChange(evt){
-    console.log(evt);
+    var readMode = readModeDropdown.value;
+    
+    if(evt.srcElement.files.length > 0){
+        localFileReader.readFiles(evt.srcElement.files, readMode);
+    }
+
 }

@@ -30,15 +30,15 @@ function LocalFileReader(params){
 	 *	Getter for the file buffer, usable e.g. if the onReadCompleted callback was not defined.
 	 */
 	this.getFiles = function(){
-		return _fileBuffer;
-	};
+		return this._fileBuffer;
+	}.bind(this);
 
 	/**
 	 *	Get a single file from the file buffer.
 	 */
 	this.getFile = function(i){
 		return this._fileBuffer[i] || null;
-	};
+	}.bind(this);
 
 	/**
 	 *	Main function: gets a FileList input. For each one, reads the File using FileReader's read methods (read as array/binary/dataURL/text).
@@ -47,7 +47,7 @@ function LocalFileReader(params){
 	 *		inputFiles: FileList
 	 *		inputMode: attempt to read all the files in the FileList using this mode (see LocalFileReader.ReadMode for enumeration)
 	 */
-	this.read = function(inputFiles, inputMode){
+	this.readFiles = function(inputFiles, inputMode){
 		var currentFile, reader, mode;
 
 		this._filesInQueue = inputFiles.length;
@@ -60,7 +60,7 @@ function LocalFileReader(params){
 			};
 
 			reader = new FileReader();
-			attachStandardCallbacks(reader);
+			attachStandardCallbacks(reader, currentFile);
 
 			mode = currentFile.readMode || inputMode || LocalFileReader.ReadMode.TEXT; // order of priority: fileBuffer entry's readMode, the general mode supplied to the read method, or Text as a fallback
 
@@ -81,9 +81,9 @@ function LocalFileReader(params){
 					throw new Error(_errorTexts.UNEXPECTED_READ_MODE); // occurs if an invalid read mode is supplied
 			}
 
-			_fileBuffer.push(currentFile);
+			this._fileBuffer.push(currentFile);
 		}
-	};
+	}.bind(this);
 
 	/**
 	 *	Clear the file buffer and read marker
@@ -92,8 +92,8 @@ function LocalFileReader(params){
 		while(_fileBuffer.length > 0){
 			_fileBuffer.pop();
 		}
-		_filesInQueue = 0;
-	};
+		this._filesInQueue = 0;
+	}.bind(this);
 
 	this.registerCallbacks = function(callbacks){
 		if(callbacks == null){
@@ -103,14 +103,14 @@ function LocalFileReader(params){
 		this._callbacks = callbacks;
 	}
 
-	var attachStandardCallbacks = function(fileReader)
+	var attachStandardCallbacks = function(fileReader, currentFile)
 	{
 		if(fileReader == null)
 		{
 			throw new Error(_errorTexts.UNKNOWN_ERROR); // this should never happen...
 		}
 
-		fileReader.addEventListener("loadend", function(currentFile, evt){
+		fileReader.addEventListener("loadend", function(evt){
 			if (evt.target.readyState === FileReader.DONE) { // DONE === 2
 				currentFile.content = evt.target.result;
 				this._filesInQueue--;
@@ -118,8 +118,8 @@ function LocalFileReader(params){
 					this._callbacks.onloadend && this._callbacks.onloadend(this._fileBuffer);
 				}
 			}
-		}.bind(this, currentFile));
-	}
+		}.bind(this));
+	}.bind(this);
 
 	init();
 }
