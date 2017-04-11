@@ -50,6 +50,8 @@ function LocalFileReader(params){
 	this.readFiles = function(inputFiles, inputMode){
 		var currentFile, reader, mode;
 
+		this.clear();
+
 		this._filesInQueue = inputFiles.length;
 
 		for(var i = 0; i < inputFiles.length; i++){
@@ -89,8 +91,8 @@ function LocalFileReader(params){
 	 *	Clear the file buffer and read marker
 	 */
 	this.clear = function(){
-		while(_fileBuffer.length > 0){
-			_fileBuffer.pop();
+		while(this._fileBuffer.length > 0){
+			this._fileBuffer.pop();
 		}
 		this._filesInQueue = 0;
 	}.bind(this);
