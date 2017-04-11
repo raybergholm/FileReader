@@ -2,9 +2,11 @@
 // Copyright 2016 Raymond Bergholm - https://github.com/raybergholm - MIT licence.
 
 function LocalFileReader(params){
-	var errorTexts = {
+	var _errorTexts = {
 		FILE_API_UNSUPPORTED: "File APIs unsupported: File, FileReader, FileList or Blob is missing",
-		UNEXPECTED_READ_MODE: "Unexpected read mode: check if the input value matches the ReadMode enumeration"
+		UNEXPECTED_READ_MODE: "Unexpected read mode: check if the input value matches the ReadMode enumeration",
+		MISSING_CALLBACKS: "No callbacks supplied to read method",
+		UNKNOWN_ERROR: "Unknown error"
 	};
 
 	if(!window.File || !window.FileReader || !window.FileList || !window.Blob){
@@ -14,17 +16,21 @@ function LocalFileReader(params){
 
 	this._fileBuffer = [];
 	this._filesInQueue = 0;
+	this._callbacks = {};
 
-	this._callbacks = {
-		onReadCompleted: params.readCompleted || null
-		// TODO 2: extra callbacks where applicable
-	};
+	var init = function(){
+		if(params != null){
+			if(params.hasOwnProperty("callbacks")){
+				this.registerCallbacks(params.callbacks);
+			}
+		}
+	}.bind(this);
 
 	/**
 	 *	Getter for the file buffer, usable e.g. if the onReadCompleted callback was not defined.
 	 */
 	this.getFiles = function(){
-		return this._fileBuffer;
+		return _fileBuffer;
 	};
 
 	/**
@@ -54,88 +60,68 @@ function LocalFileReader(params){
 			};
 
 			reader = new FileReader();
-			attachCallbacks(reader);
+			attachStandardCallbacks(reader);
 
-			mode = currentFile.readMode || inputMode || this.ReadMode.TEXT; // order of priority: fileBuffer entry's readMode, the general mode supplied to the read method, or Text as a fallback
+			mode = currentFile.readMode || inputMode || LocalFileReader.ReadMode.TEXT; // order of priority: fileBuffer entry's readMode, the general mode supplied to the read method, or Text as a fallback
 
 			switch(mode){
-				case this.ReadMode.ARRAY_BUFFER:
+				case LocalFileReader.ReadMode.ARRAY_BUFFER:
 					reader.readAsArrayBuffer(currentFile.file);
 					break;
-				case this.ReadMode.BINARY:
+				case LocalFileReader.ReadMode.BINARY:
 					reader.readAsBinaryString(currentFile.file);
 					break;
-				case this.ReadMode.DATA_URL:
+				case LocalFileReader.ReadMode.DATA_URL:
 					reader.readAsDataURL(currentFile.file);
 					break;
-				case this.ReadMode.TEXT:
+				case LocalFileReader.ReadMode.TEXT:
 					reader.readAsText(currentFile.file);
 					break;
 				default:
-					throw new Error(errorTexts.UNEXPECTED_READ_MODE); // occurs if an invalid read mode is supplied
+					throw new Error(_errorTexts.UNEXPECTED_READ_MODE); // occurs if an invalid read mode is supplied
 			}
 
-			this._fileBuffer.push(currentFile);
+			_fileBuffer.push(currentFile);
 		}
 	};
 
 	/**
-	 *	Clear the file buffer and read marker, call this if reusing the file reader for other file sets.
+	 *	Clear the file buffer and read marker
 	 */
 	this.clear = function(){
-		while(this._fileBuffer.length > 0){
-			this._fileBuffer.pop();
+		while(_fileBuffer.length > 0){
+			_fileBuffer.pop();
 		}
-		this._filesInQueue = 0;
+		_filesInQueue = 0;
 	};
 
-	/**
-	 *	Wrapper function for this.read() in ArrayBuffer read mode.
-	 */
-	this.readAsArrayBuffer = function(inputFiles){
-		this.read(inputFiles, this.ReadMode.ARRAY_BUFFER);
-	};
+	this.registerCallbacks = function(callbacks){
+		if(callbacks == null){
+			throw new Error(_errorTexts.MISSING_CALLBACKS); // no callbacks supplied
+		}
 
-	/**
-	 *	Wrapper function for this.read() in Binary read mode.
-	 */
-	this.readAsBinary = function(inputFiles){
-		this.read(inputFiles, this.ReadMode.BINARY);
-	};
+		this._callbacks = callbacks;
+	}
 
-	/**
-	 *	Wrapper function for this.read() in DataURL read mode.
-	 */
-	this.readAsDataURL = function(inputFiles){
-		this.read(inputFiles, this.ReadMode.DATA_URL);
-	};
-
-	/**
-	 *	Wrapper function for this.read() in Text read mode.
-	 */
-	this.readAsText = function(inputFiles){
-		this.read(inputFiles, this.ReadMode.TEXT);
-	};
-
-	var attachCallbacks = function(fileReader){
-		if(this._callbacks.onReadCompleted !== null)
+	var attachStandardCallbacks = function(fileReader)
+	{
+		if(fileReader == null)
 		{
-			reader.addEventListener("loadend", function(currentFile, evt){
-				if (evt.target.readyState === FileReader.DONE) { // DONE === 2
-					currentFile.content = evt.target.result;
-					this._filesInQueue--;
-					if(this._filesInQueue === 0){
-						this._callbacks.onReadCompleted && this._callbacks.onReadCompleted(this._fileBuffer);
-					}
-				}
-			}.bind(this, currentFile));
+			throw new Error(_errorTexts.UNKNOWN_ERROR); // this should never happen...
 		}
+
+		reader.addEventListener("loadend", function(currentFile, evt){
+			if (evt.target.readyState === FileReader.DONE) { // DONE === 2
+				currentFile.content = evt.target.result;
+				this._filesInQueue--;
+				if(this._filesInQueue === 0){
+					this._callbacks.onloadend && this._callbacks.onloadend(this._fileBuffer);
+				}
+			}
+		}.bind(this, currentFile));
 	}
 
-	// This is at the end as this should only run when everything else has been set. If some files were passed into the constructor, read them immediately.
-	if(params.files && params.files.length > 0){
-		this.read(params.files, params.readMode); // TODO 1.2: currently this relies on being able to read RtwFileReader.ReadMode without instantiation
-	}
+	init();
 }
 
 LocalFileReader.ReadMode = {
