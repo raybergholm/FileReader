@@ -2,14 +2,14 @@
 // Copyright 2016 Raymond Bergholm - https://github.com/raybergholm - MIT licence.
 
 function RtwFileReader(params){
-	this.ErrorTexts = {
+	var errorTexts = {
 		FILE_API_UNSUPPORTED: "File APIs unsupported: File, FileReader, FileList or Blob is missing",
 		UNEXPECTED_READ_MODE: "Unexpected read mode: check if the input value matches the ReadMode enumeration"
 	};
 
 	if(!window.File || !window.FileReader || !window.FileList || !window.Blob){
 		// Missing some support for the file APIs, throw an error.
-		throw new Error(this.ErrorTexts.FILE_API_UNSUPPORTED);
+		throw new Error(errorTexts.FILE_API_UNSUPPORTED);
 	}
 	
 	this._fileBuffer = [];
@@ -80,7 +80,7 @@ function RtwFileReader(params){
 					reader.readAsText(currentFile.file);
 					break;
 				default:
-					throw new Error(this.ErrorTexts.UNEXPECTED_READ_MODE); // occurs if an invalid read mode is supplied
+					throw new Error(errorTexts.UNEXPECTED_READ_MODE); // occurs if an invalid read mode is supplied
 			}
 			
 			this._fileBuffer.push(currentFile);
