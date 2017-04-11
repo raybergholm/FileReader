@@ -110,7 +110,7 @@ function LocalFileReader(params){
 			throw new Error(_errorTexts.UNKNOWN_ERROR); // this should never happen...
 		}
 
-		reader.addEventListener("loadend", function(currentFile, evt){
+		fileReader.addEventListener("loadend", function(currentFile, evt){
 			if (evt.target.readyState === FileReader.DONE) { // DONE === 2
 				currentFile.content = evt.target.result;
 				this._filesInQueue--;
