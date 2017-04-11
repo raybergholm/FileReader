@@ -2,13 +2,6 @@
 // Copyright 2016 Raymond Bergholm - https://github.com/raybergholm - MIT licence.
 
 function RtwFileReader(params){
-	this.ReadMode = { // TODO 1.1: static? being able to read this from RtwFileReader.ReadMode would be a QoL improvement
-		ARRAY_BUFFER: 'a', 
-		BINARY: 'b',
-		DATA_URL: 'd',
-		TEXT: 't'
-	};
-	
 	this.ErrorTexts = {
 		FILE_API_UNSUPPORTED: "File APIs unsupported: File, FileReader, FileList or Blob is missing",
 		UNEXPECTED_READ_MODE: "Unexpected read mode: check if the input value matches the ReadMode enumeration"
@@ -137,3 +130,10 @@ function RtwFileReader(params){
 		this.read(params.files, params.readMode); // TODO 1.2: currently this relies on being able to read RtwFileReader.ReadMode without instantiation
 	}
 }
+
+RtwFileReader.ReadMode = {
+	ARRAY_BUFFER: 'a', 
+	BINARY: 'b',
+	DATA_URL: 'd',
+	TEXT: 't'
+};
