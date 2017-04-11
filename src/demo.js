@@ -23,7 +23,6 @@ function handleFileInputChange(evt){
     if(evt.srcElement.files.length > 0){
         localFileReader.readFiles(evt.srcElement.files, readMode);
     }
-
 }
 
 function handleFileContents(files)
