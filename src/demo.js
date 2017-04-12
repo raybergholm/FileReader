@@ -21,6 +21,7 @@ function handleFileInputChange(evt){
     var readMode = readModeDropdown.value;
 
     if(evt.srcElement.files.length > 0){
+        clearUIElements();
         localFileReader.readFiles(evt.srcElement.files, readMode);
     }
 }
@@ -29,13 +30,29 @@ function handleFileContents(files)
 {
     for(var i = 0; i < files.length; i++)
     {
-        var newDiv = document.createElement("div");
-        newDiv.classList.add("col-md-4");
-
-        var paragraphElement = document.createElement("p");
-        paragraphElement.innerHTML = files[i].content;
-
-        newDiv.appendChild(paragraphElement);
+        var newDiv = createNewUIElement(files[i].file.name, files[i].content);
         outputDiv.appendChild(newDiv);
+    }
+}
+
+function createNewUIElement(header, content){
+    var newDiv = document.createElement("div");
+    newDiv.classList.add("col-md-4");
+
+    var headerElement = document.createElement("h3");
+    headerElement.innerHTML = header;
+
+    var paragraphElement = document.createElement("p");
+    paragraphElement.innerHTML = content;
+
+    newDiv.appendChild(headerElement);
+    newDiv.appendChild(paragraphElement);
+
+    return newDiv;
+}
+
+function clearUIElements(){
+    while(outputDiv.hasChildNodes()){
+        outputDiv.removeChild(outputDiv.lastChild);
     }
 }
