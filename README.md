@@ -8,17 +8,19 @@ Use demo.html for a basic demonstration.
 
 ### Quick use guide
 
-When instantiating the LocalFileReader, pass in the callbacks to the constructor (currently only loadend is implemented):
+When instantiating the LocalFileReader, pass in the callbacks to the constructor:
 
 ```javascript
-    var localFileReader = new LocalFileReader({
+    localFileReader = new LocalFileReader({
         callbacks: {
-            loadend: foo    // your callback here
+            load: onLoad,
+            error: onError,
+            readComplete: onReadComplete
         }
     });
 ```
 
-Afterwards, when you need to read file contents call readFiles() and pass in the fileList and read mode:
+Afterwards, when you need to read file contents call `readFiles()` and pass in the fileList and read mode:
 
 ```javascript
     var files = document.getElementById("multipleFileInput").files; // substitute in your file list source
@@ -27,3 +29,15 @@ Afterwards, when you need to read file contents call readFiles() and pass in the
 ```
 
 The callbacks will be called where applicable.
+
+### Callbacks
+
+This callback comes with the contents of `_fileBuffer` in the callback's first argument.
+* readComplete: fired when the read operation has been completed for all the input files.
+
+All of these callbacks have the corresponding file in the callback's first argument.
+* loadstart: fired when the read operation starts.
+* progress: fired when the read operation is in progress.
+* load: fired when the read operation finished successfully.
+* error: fired when the read operation fails.
+* abort: fired when the read operation was aborted.
