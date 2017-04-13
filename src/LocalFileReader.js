@@ -44,10 +44,10 @@ function LocalFileReader(params){
 	 *	Main function: gets a FileList input. For each one, reads the File using FileReader's read methods (read as array/binary/dataURL/text).
 	 *
 	 *	Params:
-	 *		inputFiles: FileList
-	 *		inputMode: attempt to read all the files in the FileList using this mode (see LocalFileReader.ReadMode for enumeration)
+	 *		inputFiles: a FileList
+	 *		inputMode: attempt to read all the files in the FileList using this mode (see LocalFileReader.ReadMode for enumeration). Alternatively, supply an array of read modes if each file needs a different mode
 	 */
-	this.readFiles = function(inputFiles, inputMode){
+	this.readFiles = function(inputFiles, inputReadMode){
 		var currentFile, reader, mode;
 
 		this.clear();
@@ -58,13 +58,14 @@ function LocalFileReader(params){
 			currentFile = {
 				file: inputFiles[i],
 				content: "",
-				readMode: (Array.isArray(inputMode) && inputMode[i]) ? inputMode[i] : undefined
+				status: "NOT_READ",
+				readMode: (Array.isArray(inputReadMode) && inputReadMode[i]) ? inputReadMode[i] : undefined
 			};
 
 			reader = new FileReader();
-			attachStandardCallbacks(reader, currentFile);
+			attachCallbacks(reader, currentFile);
 
-			mode = currentFile.readMode || inputMode || LocalFileReader.ReadMode.TEXT; // order of priority: fileBuffer entry's readMode, the general mode supplied to the read method, or Text as a fallback
+			mode = currentFile.readMode || inputReadMode || LocalFileReader.ReadMode.TEXT; // order of priority: fileBuffer entry's readMode, the general mode supplied to the readFiles method, or Text as a fallback
 
 			switch(mode){
 				case LocalFileReader.ReadMode.ARRAY_BUFFER:
@@ -105,25 +106,57 @@ function LocalFileReader(params){
 		this._callbacks = callbacks;
 	}.bind(this);
 
-	var attachStandardCallbacks = function(fileReader, currentFile)
+	var attachCallbacks = function(fileReader, currentFile)
 	{
 		if(fileReader == null)
 		{
 			throw new Error(_errorTexts.UNKNOWN_ERROR); // this should never happen...
 		}
 
-		fileReader.addEventListener("loadend", function(evt){
+		// Mandatory callbacks
+		fileReader.addEventListener("loadend", function(evt){ // track when files have been read (whether success or failure)
 			if (evt.target.readyState === FileReader.DONE) { // DONE === 2
 				currentFile.content = evt.target.result;
 				this._filesInQueue--;
 
-				this._callbacks.loadend && this._callbacks.loadend(currentFile); // custom loadend callback
+				this._callbacks && this._callbacks.loadend && this._callbacks.loadend(currentFile);
 
 				if(this._filesInQueue === 0){
-					this._callbacks.allFilesReady && this._callbacks.allFilesReady(this._fileBuffer);
+					this._callbacks && this._callbacks.readComplete && this._callbacks.readComplete(this._fileBuffer);
 				}
 			}
 		}.bind(this));
+
+		fileReader.addEventListener("load", function(evt){ // marks file as successfully read
+			currentFile.status = "SUCCESS";
+			this._callbacks && this._callbacks.load && this._callbacks.load(currentFile);
+		}.bind(this));
+
+		fileReader.addEventListener("error", function(evt){ // marks read operation as unsuccessful
+			currentFile.status = "ERROR";
+			this._callbacks && this._callbacks.error && this._callbacks.error(currentFile);
+		}.bind(this));
+
+		// Optional callbacks for extra handling
+		if(this._callbacks){
+			if(this._callbacks.loadstart){
+				fileReader.addEventListener("loadstart", function(evt){
+					this._callbacks.loadstart && this._callbacks.loadstart(currentFile);
+				}.bind(this));
+			}
+
+			if(this._callbacks.progress){
+				fileReader.addEventListener("progress", function(evt){
+					this._callbacks.progress && this._callbacks.progress(currentFile);
+				}.bind(this));
+			}
+
+			if(this._callbacks.abort){
+				fileReader.addEventListener("abort", function(evt){
+					this._callbacks.abort && this._callbacks.abort(currentFile);
+				}.bind(this));
+			}
+		}
 	}.bind(this);
 
 	init();
