@@ -1,4 +1,3 @@
-
 var fileInput, outputDiv, readModeDropdown, localFileReader;
 
 window.onload = function(evt){
@@ -12,7 +11,9 @@ window.onload = function(evt){
 
     localFileReader = new LocalFileReader({
         callbacks: {
-            allFilesReady: handleFileContents
+            load: onLoad,
+            error: onError,
+            readComplete: onReadComplete
         }
     });
 }
@@ -26,8 +27,15 @@ function handleFileInputChange(evt){
     }
 }
 
-function handleFileContents(files)
-{
+function onLoad(file){
+    console.log("Read operation successful for file " + file.file.name);
+}
+
+function onError(file){
+    console.log("Read operation error for file " + file.file.name);
+}
+
+function onReadComplete(files){
     for(var i = 0; i < files.length; i++)
     {
         var newDiv = createNewUIElement(files[i].file.name, files[i].content);
