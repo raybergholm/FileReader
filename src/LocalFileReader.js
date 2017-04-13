@@ -68,16 +68,16 @@ function LocalFileReader(params){
 			mode = currentFile.readMode || inputReadMode || LocalFileReader.ReadMode.TEXT; // order of priority: fileBuffer entry's readMode, the general mode supplied to the readFiles method, or Text as a fallback
 
 			switch(mode){
-				case LocalFileReader.ReadMode.ARRAY_BUFFER:
+				case LocalFileReader.ReadMode.ArrayBuffer:
 					reader.readAsArrayBuffer(currentFile.file);
 					break;
-				case LocalFileReader.ReadMode.BINARY:
+				case LocalFileReader.ReadMode.Binary:
 					reader.readAsBinaryString(currentFile.file);
 					break;
-				case LocalFileReader.ReadMode.DATA_URL:
+				case LocalFileReader.ReadMode.DataURL:
 					reader.readAsDataURL(currentFile.file);
 					break;
-				case LocalFileReader.ReadMode.TEXT:
+				case LocalFileReader.ReadMode.Text:
 					reader.readAsText(currentFile.file);
 					break;
 				default:
@@ -163,8 +163,8 @@ function LocalFileReader(params){
 }
 
 LocalFileReader.ReadMode = {
-	ARRAY_BUFFER: 'A',
-	BINARY: 'B',
-	DATA_URL: 'D',
-	TEXT: 'T'
+	ArrayBuffer: 'A',
+	Binary: 'B',
+	DataURL: 'D',
+	Text: 'T'
 };
