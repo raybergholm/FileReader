@@ -7,7 +7,8 @@ window.onload = function(evt){
     }
 
     outputDiv = document.getElementById("outputDiv");
-    readModeDropdown = document.getElementById("readModeDropdown");
+
+    InitializeDropdown();
 
     localFileReader = new LocalFileReader({
         callbacks: {
@@ -40,6 +41,24 @@ function onReadComplete(files){
     {
         var newDiv = createNewUIElement(files[i].file.name, files[i].content);
         outputDiv.appendChild(newDiv);
+    }
+}
+
+function InitializeDropdown(){
+    readModeDropdown = document.getElementById("readModeDropdown");
+    if(readModeDropdown){
+        var newOption;
+
+        for(mode in LocalFileReader.ReadMode){
+            newOption = document.createElement("option");
+            newOption.value = LocalFileReader.ReadMode[mode];
+            newOption.innerHTML = mode.replace(/([a-z])([A-Z])/g, '$1 $2').trim();
+
+            readModeDropdown.appendChild(newOption);
+            if(LocalFileReader.ReadMode[mode] === LocalFileReader.ReadMode.Text){
+                readModeDropdown.selectedIndex = readModeDropdown.length - 1;
+            }
+        }
     }
 }
 

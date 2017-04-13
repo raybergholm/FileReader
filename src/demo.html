@@ -3,9 +3,7 @@
         <!-- Bootstrap CSS //-->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-        <!-- LocalFileReader import //-->
         <script src="LocalFileReader.js"></script>
-
         <script src="demo.js"></script>
     </head>
     <body>
@@ -20,16 +18,10 @@
                 </div>
                 <div class="col-md-4">
                     <label for="readModeDropdown">Read mode</label>
-                    <select id="readModeDropdown" name="readMode">
-                        <option value="A">Array buffer</option>
-                        <option value="B">Binary</option>
-                        <option value="D">Data URL</option>
-                        <option value="T" selected="selected">Text</option>
-                    </select>
+                    <select id="readModeDropdown" name="readMode"></select>
                 </div>
             </div>
-            <div class="row">
-            </div>
+            <hr>
             <div id="outputDiv" class="row">
             </div>
         </div>
