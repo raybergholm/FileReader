@@ -10,14 +10,17 @@ const LocalFileReader = Object.freeze({
 	}),
 	read: (inputFiles, inputReadMode = "T") => {
 		const errorTexts = {
+			UNKNOWN_ENVIRONMENT: "No Window object, what environment are you running on?",
 			FILE_API_UNSUPPORTED: "File APIs unsupported: File, FileReader, FileList or Blob is missing",
 			NO_FILELIST: "No file list given",
-			INVALID_FILELIST: "File list input was invalid",
+			INVALID_FILELIST: "File list input was invalid (not a FileList object)",
 			UNEXPECTED_READ_MODE: "Unexpected read mode: check if the input value matches the ReadMode enumeration",
 		};
 
 		// Sanity checks
-		if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
+		if (!window) {
+			throw new Error(errorTexts.UNKNOWN_ENVIRONMENT);
+		} else if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
 			throw new Error(errorTexts.FILE_API_UNSUPPORTED);
 		} else if (!inputFiles) {
 			throw new Error(errorTexts.NO_FILELIST);
@@ -41,7 +44,7 @@ const LocalFileReader = Object.freeze({
 				fileReader.addEventListener("error", (evt) => {
 					reject({
 						file: file,
-						error: evt.type
+						error: fileReader.error
 					});
 				});
 
