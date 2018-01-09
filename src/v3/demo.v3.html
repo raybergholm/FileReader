@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <!-- Bootstrap CSS //-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+        <script type="module" src="demo.v3.js"></script>
+    </head>
+    <body>
+        <div class="jumbotron text-center">
+            <h1>Local File Reader demo</h1>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <label for="fileInput">File</label>
+                    <input id="fileInput" type="file" multiple>
+                </div>
+                <div class="col-md-4">
+                    <label for="readModeDropdown">Read mode</label>
+                    <select id="readModeDropdown" name="readMode"></select>
+                </div>
+            </div>
+            <hr>
+            <div id="outputDiv" class="row">
+            </div>
+        </div>
+    </body>
+</html>
