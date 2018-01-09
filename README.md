@@ -1,61 +1,74 @@
 # LocalFileReader
 
-A JavaScript file reader which extends the functionality of the standard FileReader. This class adds an extra abstraction layer to the basic FileReader to simplify usage and keep the read results linked to its respective file.
+Dealing with file uploads, but you want to do some read the file content and do checks on the frontend before sending it to the backend? Or maybe you need to read a bunch of files together, but the built-in JS [FileReader] object reads asynchronously and you just want to handle the results once everything is done.
+
+This is a really simple JavaScript file reader extension which wraps around the built-in FileReader. No dependencies required other than a browser that's sufficiently up to date.
+
+Feed in a [FileList] with an optional read mode, and it will return the results of a [Promise.All] which can be handled with a `.then()`. I'm assuming that if any promise rejects, then there's some major issue going on so you probably want to sort it out first.
+
+No dependencies required.
 
 Check out the demo files for a basic demonstration.
 
 ### Quick use guide
 
-First, instantiate the LocalFileReader by passing in the callbacks to the constructor:
+Include the LocalFileReader source code however you want.
+
+Then, when you need to read files:
 
 ```javascript
-    localFileReader = new LocalFileReader({
-        callbacks: {
-            load: onLoad,
-            error: onError,
-            readComplete: onReadComplete
-        }
-    });
+    LocalFileReader.read(files, readMode)
+        .then((result) => {
+            // do whatever
+        })
+        .catch((err) => {
+            // oh dear
+        });
 ```
-
-Alternatively, you can also add/change callbacks using the `registerCallbacks()` function:
+You can skip `readMode`, if not given then it will default to reading as text:
 
 ```javascript
-    localFileReader.registerCallbacks({
-        callbacks: {
-            load: onLoad,
-            error: onError,
-            readComplete: onReadComplete
-        }
-    });
+    LocalFileReader.read(files) // inside the function, readmode = text mode
+        .then((result) => {
+            // do whatever
+        })
+        .catch((err) => {
+            // oh dear
+        });
 ```
 
-Afterwards, when you need to read file contents call `readFiles()` and pass in the fileList and read mode:
+The results will be in the following format:
 
 ```javascript
-    var files = document.getElementById("multipleFileInput").files; // substitute in your file list source
-    var readMode = LocalFileReader.TEXT;    // use whichever mode you need
-    localFileReader.readFiles(files, readMode);
+    result = [
+        {
+            file: File, // this will be a File object
+            content: "lorem ipsum" // whatever was read from the file
+        },
+        ...
+    ];
 ```
 
-### Callbacks
+If there was an error:
 
-This callback comes with the contents of `_fileBuffer` in the callback's first argument.
-* readComplete: fired when the read operation has been completed for all the input files.
-
-All of these callbacks have the corresponding file in the callback's first argument.
-* loadstart: fired when the read operation starts.
-* progress: fired when the read operation is in progress.
-* load: fired when the read operation finished successfully.
-* error: fired when the read operation fails.
-* abort: fired when the read operation was aborted.
-
-### File data structure
 ```javascript
-    file = {
-        file:
-        content:
-        status:
-        readMode:
-    };
+    result = [
+        {
+            file: File, // this will be a File object
+            error: DOMException // the error which was thrown
+        },
+        ...
+    ];
 ```
+
+## HISTORY
+
+**v3:** WIP at the moment. Meant for use with a module system. Aiming to move away from promises to async/await style instead.
+
+**v2:** Threw away most of the old v1 code and rewrote everything to use a Promise.All instead.
+
+**v1:** Really old hacky callback style, don't use this
+
+[FileReader]: https://developer.mozilla.org/en-US/docs/Web/API/FileReader
+[FileList]: https://developer.mozilla.org/en-US/docs/Web/API/FileList
+[Promise.All]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
