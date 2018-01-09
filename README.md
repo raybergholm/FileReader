@@ -10,7 +10,7 @@ No dependencies required.
 
 Check out the demo files for a basic demonstration.
 
-### Quick use guide
+## Quick use guide (v2)
 
 Include the LocalFileReader source code however you want.
 
@@ -61,7 +61,7 @@ If there was an error:
     ];
 ```
 
-## HISTORY
+## History
 
 **v3:** WIP at the moment. Meant for use with a module system. Aiming to move away from promises to async/await style instead.
 
